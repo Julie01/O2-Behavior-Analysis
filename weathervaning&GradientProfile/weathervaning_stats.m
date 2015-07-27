@@ -37,13 +37,21 @@ set(gca,'XTickLabel',sf);
 set(gca,'XTick', 1:4)
 
 for ii= [1 3]
-[h(ii), p(ii)]=nanranksum(allTB(:,ii),allTB(:,ii+1));
+ a=allTB(:,ii)  ;
+ a=a(~isnan(a));
+  b=allTB(:,ii+1)  ;
+ b=b(~isnan(b));
+[h(cc), p(cc)]=ranksum(a,b);
 text(ii+0.3,0.04,num2str(h(ii)))
 end
 
-cc=1
+cc=1;
 for ii= [1 2]
-[h(cc), p(cc)]=nanranksum(allTB(:,ii),allTB(:,ii+2));
+ a=allTB(:,ii)  ;
+ a=a(~isnan(a));
+  b=allTB(:,ii+2)  ;
+ b=b(~isnan(b));
+[h(cc), p(cc)]=ranksum(a,b);
 text(cc,-0.18,num2str(h(cc)))
 cc=cc+1;
 end
