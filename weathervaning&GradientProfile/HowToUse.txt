@@ -1,0 +1,45 @@
+
+1)GradientHeatmap_batch.m
+
+First pops up first frame of first window, to define the ROI via user clicks.
+Then bins and normalizes positions of animals over time, stores them in 3D matrix HMnorm, needs *als.mat files annd the 
+original video in a folder.
+
+
+2) GradientTimecourseProfile.m
+
+Makes normalized profiles of animals postions i arena for several timepoints.
+
+%-----------------------
+
+Weathervaning:
+
+
+1)WeatherVaningHF_15hz_center.m
+
+Needs *als.mat files as input.
+For each good track(too short, too slow, too wobbling, not moving get excluded) takes data for central area 
+and stores data only for runs in matrix (XY, bearing etc): rinunfo**.mat file
+
+
+2)weathervaning_plots_multi.m(deg/s) or weathervaning_speed_normalized_multi.m(rad/mm)
+
+plots weathervaning barplots (needs 1 or more runinfo files as input)
+
+
+3)weathervaning_stats.m
+
+takes or various genotypes/conditions all data from central 40-150 degree bin and barplots the turning bias value, needs runinfo as input 
+and a Genotype\control or gradient\runinfo*.mat folder structure.
+
+
+
+%-------------
+
+Speed modulation:
+
+1)speed_plots_pooled.m
+
+Needs runinfo file as input.Plots mean speed vor several bearing bins over various genotypes. 
+Needs a Genotype\control or gradient\runinfo*.mat folder structure.
+		
