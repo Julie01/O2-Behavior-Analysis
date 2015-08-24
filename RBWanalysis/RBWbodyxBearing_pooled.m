@@ -17,31 +17,26 @@ for GT =1:2 % if you have 2 folders with control and gradient data
     elseif GT==2
         cd('gradient')
     end
-    
-    mRBW=NaN(2,4);
-    mB=NaN(2,4);
-    mC=NaN(2,4);
+     
+    AllPeakBearing=[];
+    AllPeakCurving=[];
+    AllPeakRBW=[];
     
     files=dir('*_als.mat');
     EWfiles=dir('*als_V8_EigenWormTracks.mat');
     
     %% do analysis for various variables and put in subplots
     Vidx=  [ 2 ] ; % variable index, 2= RBW,
-    EC=1;
-    for E=1:11
-        %for E=1:length(files)
+    
+%     for E=1:11
+        for E=1:length(files)
         E
         disp('...loading')
         load(files(E).name)
         load(EWfiles(E).name)
-        
         FNames = fieldnames(EigenWormTracks);
         
-        FNames{Vidx}
         
-        AllPeakBearing=[];
-        AllPeakCurving=[];
-        AllPeakRBW=[];
         %%
         for TN=1:length(Tracks) % go through all tracks of current video
             
@@ -104,7 +99,7 @@ for GT =1:2 % if you have 2 folders with control and gradient data
                     peaks=vertcat(minR, maxR);
                     
                     %%plot RBW and peaks:
-                    if GT==1 & E==1 & TN<4
+                    if GT==1 & E==1 & TN<1
                         figure
                         cla
                         hold on
@@ -132,50 +127,53 @@ for GT =1:2 % if you have 2 folders with control and gradient data
             
         end % end Track loop
         
-        
-        
-        %% bin by bearing
-        cc=1;
-        %bin -->for what?
-        a=5;
-        for i=5 :a:175
-            
-            bin_idx= AllPeakBearing>i & AllPeakBearing<i+a;
-            pb1= AllPeakBearing(bin_idx);
-            pc1= AllPeakCurving(bin_idx);
-            rbw_bin=abs(AllPeakRBW(bin_idx));
-            
-            mB(EC,cc)=nanmean(pb1);
-            mC(EC,cc)=nanmean(pc1);
-            mRBW(EC,cc)=nanmean(rbw_bin);
-            
-            cc=cc+1;
-        end
-        save mRBW mRBW
-        EC=EC+1;
     end % end files loop
     
-    meanRBW(GT,1:length(nanmean(mRBW)))=nanmean(mRBW,1);
+    %% bin by bearing
+    mRBW=NaN(1,4);
+    mB=NaN(1,4);
+    mC=NaN(1,4);
+    cc=1;
+    %bin -->for what?
+    a=5;
+    for i=5 :a:175
+        
+        bin_idx= AllPeakBearing>i & AllPeakBearing<i+a;
+        pb1= AllPeakBearing(bin_idx);
+        pc1= AllPeakCurving(bin_idx);
+        rbw_bin=abs(AllPeakRBW(bin_idx));
+        
+        mB(1,cc)=nanmean(pb1);
+        mC(1,cc)=nanmean(pc1);
+        mRBW(1,cc)=nanmean(rbw_bin);
+        rbw_bins{cc}=rbw_bin;
+        sem=nanstd(rbw_bin,1)/sqrt(E);
+        
+        cc=cc+1;
+    end
     
+    save rbw_bins rbw_bins
+    
+
     %% plot:(1) variable binned by bearing
     name=dirname(cd);
     CM=(winter(2)/1.5);
     figure(fig)
     set(fig, 'name',name)
     
-    sem=nanstd(mRBW,1)/sqrt(E);
     hold on
-    scatter(1:cc-1,nanmean(mRBW,1),'markerfacecolor',CM(GT,:));
+    scatter(1:cc-1,mRBW,'markerfacecolor',CM(GT,:));
     %errorb(nanmean(mRBW,1),sem,'color',[0.5 0.5 0.5])
-    set(gca,'XTick',[1:length(mB)])
-    set(gca,'XTickLabel',(round(nanmedian(mB)*1)/1));
+    set(gca,'XTick',[1:2:length(mB)])
+    set(gca,'XTickLabel',(round(mB(1:2:end)*1)/1));
     xlabel('bearing')
     ylabel('mean rbw peak value')
     title (['RBW body peak cutoff/delta=' num2str(peakcutoff) '/' num2str(peakdelta)])
     ylim auto
     ylim([0.12 0.139])
     
-    [h(GT),p(GT)]=corr(nanmean(mRBW)',nanmean(mB)')
+    [h(GT),p(GT)]=corr(mRBW',mB')
+    
     
     %%%%
     
