@@ -1,21 +1,34 @@
-%% weathervaning hist
+%% weathervaning bar plots
 % use on runinfo files
 clear
-warning off;
+home=cd;
 
 %plot?
-plot=1;
+plotting=1;
+SI=NaN(55,2);
+if plotting==1
+fig=figure;
+end
+
+for GT =1:2 % if you have 2 folders with control and gradient data
+    tic
+    if GT==1
+        cd('control')
+        
+    elseif GT==2
+        cd('gradient')
+    end
 files =dir('*runinfo*');
 
 %parameters:
-first=10;
-last=170;
-binsize=20;
+first=1;
+last=179;
+binsize=89;
 
 % for each experiment: put all run data into one vector:
-mP= NaN(35,8);
-mT= NaN(35,8);
-mS= NaN(35,8);
+mB= NaN(2,2);
+mT= NaN(2,2);
+mS= NaN(2,2);
 c=0;
 
 for batch=1:length(files)
@@ -56,31 +69,27 @@ for F=1:length(bearing)
 
     %kill extremely high turning rates (short reversals etc)
     
-    bi=find(tr>19 | tr<-19 );
+    bi=find(tr>19 | tr<-19);
     bi2= find(bv>last| bv<first);
     bi=[bi,bi2];
     tr(bi)=NaN;
     bv(bi)=NaN;
     sp(bi)=NaN;
-    tnorm=tr./(sp*67);
-    bi=tnorm>10 | tnorm<-10;
-    tnorm(bi)=NaN;
-     tnorm=tnorm/0.8552;  % 0.8552= conversion from deg/pix-->rad/mm 1/(67*(360/(2*pi)))
     
 if ~isempty(bv)
     
     [X,v]=hist(bv,10);
     X1(c,:)=X./sum(X);
     cc=1;
-    %bin 
+    %bin -->for what?
     
-    for i=first :binsize:(last-binsize)
+    for i=first:binsize:last
         bin_idx= bv>i & bv<=i+binsize;
         pb1=bv(bin_idx);
-        pt=tnorm(bin_idx);
+        pt=tr(bin_idx);
         st=sp(bin_idx);
 
-        mP(c,cc)=nanmean(pb1);
+        mB(c,cc)=nanmean(pb1);
         mT(c,cc)=nanmean(pt);
         mS(c,cc)=nanmean(st);
 
@@ -93,34 +102,37 @@ end
 
 end % end files loop
 
-
-
-%% plot:(1) turning rate binned by bearing
+save mS mS
+SI(1:length(mS),GT)=mS(:,2)./mS(:,1);
 nd=(cd);
 d= strfind(cd, '\');
-name=nd(d(end-1):end);
-if plot==1
-
-figure
-sem=nanstd(mT*3,1)/sqrt(c);
-hold on
-bar(nanmean(mT*3,1));
-errorb(nanmean(mT*3,1),sem)
-set(gca,'XTick',[1:length(mP)])
-set(gca,'XTickLabel',round(nanmedian(mP,1)));
-xlabel('bearing')
-ylabel('turning rate (rad/mm)')
-ylim([-0.2 0.10])
-title ([name ': speed normalized'])
-
-saveas(gca, 'weathervaning_pooled_speed_norm.fig')
-% saveas(gca, 'weathervaning.jpg')
-
+name=nd(d(end):end);
+cd(home)
 
 end
-save turningbias mT
-y=chirp(1:0.001:1.5,30);
-sound(y)
 
+legend('control','gradient ')
+
+if ~exist ('plots', 'dir')
+mkdir('plots')
+end
+%% boxplots:
+if plotting==1
+figure(fig)
+
+boxplot(SI,'whisker',1,'labels',{'nlp-12 ctrl','nlp-12 gradient'})
+
+ylabel('relative speed change (mm/min)')
+cd('plots')
+% saveas(gca, 'weathervaning_pooled_olddata.fig')
+ saveas(gca, 'speed moculation boxplot.fig')
+
+
+cd(home)
+
+end
+
+
+%% (2) bearing  binned by turning rate
 
 

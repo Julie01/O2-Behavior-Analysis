@@ -85,7 +85,7 @@ if plots==1
 
 figure(fig)
 subplot(1,length(files),batch)
-title(files(batch).name(9:end))
+title(files(batch).name(9:end-11))
 sem=nanstd(mT*3,1)/sqrt(c);
 hold on
 bar(nanmean(mT*3,1));

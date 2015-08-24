@@ -1,5 +1,5 @@
 
-clear 
+ clear 
 % global rois
 % cd('mat')
 home=cd;
@@ -7,12 +7,13 @@ nd=(cd);
 d= strfind(cd, '\');
 name=nd(d(2):d(end));
 
-files=dir('*als.mat');
+files=dir('*21-21*als.mat');
 nd=(cd);
 d= strfind(cd, '\');
 name=nd(d(2):d(end));
+% name=[name '_gradient'];
 
-skelfiles=dir('*angles*');
+% skelfiles=dir('*angles*');
  % conversion factor for head speed (mm/px) (same as in hr track analyzer)
 
 % cd ..\
@@ -23,6 +24,7 @@ for F=1:length(files)
     HeadSens HeadSpeed HeadSpeedNet
    cc=0;
    cla
+   disp('...loading Tracks')
     fname=(files(F,1).name)
     load (files(F).name);
     %load([fname(1:end-4), '_anglesV8.mat']);
@@ -47,6 +49,7 @@ for F=1:length(files)
     for T= 1:length(Tracks)
         % only tracks which start after establishment of the gradient
         % (ca frame 500)
+        
         if  Tracks(1,T).Frames(end)>3000 && Tracks(1,T).Frames(1)>1000
             
             % --plot tracks--
@@ -85,10 +88,11 @@ for F=1:length(files)
             RunX(nx)=NaN;
             RunY(nx)=NaN;
             
-            
+            if length(RunX)>40
+                
             %----exclude those which occur close to border:----
-            bi1= find( RunX<600 | RunX>1800);
-            bi2= find( RunY<50 | RunY>1000);
+            bi1= find( RunX<700 | RunX>2000);
+            bi2= find( RunY<55 | RunY>1140);
             bi= setdiff(bi1, bi2);
             bi=[bi,bi2];
             RunX(bi)=NaN;
@@ -178,7 +182,7 @@ for F=1:length(files)
                     beelineX=NaN;
                     
                     
-                    if F<3
+                    if F<0
                         CO2=2500;
                     else
                         CO2=10;
@@ -229,6 +233,7 @@ for F=1:length(files)
 %                 
 %             end
             
+            end
         end
         
     end %end Tracks loop
@@ -249,7 +254,7 @@ name=nd(d(end)+1:end)
 
 display('...save')
 
-save(['runinfo_15hz_new' fname(1:end-42)  name] , 'bearing' ,'dBearing' ,'speed_ctr');
+save(['runinfo_15hz_new_' fname(1:end-42)  name] , 'bearing' ,'dBearing' ,'speed_ctr');
 
 
 
