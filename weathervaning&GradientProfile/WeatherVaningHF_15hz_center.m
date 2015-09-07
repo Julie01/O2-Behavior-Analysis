@@ -189,7 +189,7 @@ for F=1:length(files)
                     end
                     
                     for ii=1:L-1
-                        beelineX(ii)=(CO2-(x(ii)));
+                        beelineX=(CO2-(x(ii)));
                         %                     if F==5
                         %                          beelineX(ii)=(roi(1,1)-(y(ii)));
                         %                     end
